@@ -60,7 +60,11 @@ def parse_migration(tx: dict, signature: str) -> tuple[str,list[str]] | None:
     for ix,keys in _all_instructions(tx):
         if _program_id(ix,keys)==PUMP_PROGRAM and _data(ix).startswith(MIGRATE_DISC):
             a=_accounts(ix,keys)
-            return (a[0],_candidate_pool_accounts(tx)) if a else None
+            # Current Pump migrate layout: global, withdraw_authority, mint, ...
+            # V2 variants may expose base_mint; find it by Token-2022/SPL mint
+            # validation later if needed. For the canonical migrate path account[2] is mint.
+            if len(a) >= 3:
+                return a[2],_candidate_pool_accounts(tx)
     return None
 
 def parse_activity(tx: dict, signature: str, target_pool: str, target_mint: str) -> Activity | None:
