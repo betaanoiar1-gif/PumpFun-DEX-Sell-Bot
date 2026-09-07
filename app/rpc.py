@@ -1,4 +1,3 @@
-import asyncio
 import aiohttp
 
 class RpcError(RuntimeError):
@@ -33,3 +32,6 @@ class RpcClient:
 
     async def get_multiple_accounts(self, pubkeys):
         return await self.call("getMultipleAccounts", [pubkeys, {"encoding":"base64"}])
+
+    async def get_signatures_for_address(self, pubkey: str, limit: int = 50):
+        return await self.call("getSignaturesForAddress", [pubkey, {"limit": limit}])
